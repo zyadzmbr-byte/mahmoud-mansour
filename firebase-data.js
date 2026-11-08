@@ -3,6 +3,7 @@ import {
     collection,
     addDoc,
     getDocs,
+    getDoc,
     query,
     where,
     onSnapshot,
@@ -278,6 +279,21 @@ window.fsData = {
             }
         } catch (e) {
             console.warn("deleteGeneric error", e);
+        }
+    },
+
+    // SITE SETTINGS / BRANDING (Logo & Hero Image)
+    saveBranding: async (branding) => {
+        const brandingDoc = doc(db, "site_settings", "branding");
+        return await setDoc(brandingDoc, branding, { merge: true });
+    },
+    getBranding: async () => {
+        try {
+            const snap = await getDoc(doc(db, "site_settings", "branding"));
+            return snap.exists() ? snap.data() : null;
+        } catch (e) {
+            console.warn("Failed to get branding from Firestore:", e);
+            return null;
         }
     }
 };

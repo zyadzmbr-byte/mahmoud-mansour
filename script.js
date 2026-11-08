@@ -1,9 +1,34 @@
-const WA_NUMBER = "01098858663";
+const WA_NUMBER = "01016789678";
 const WA_LINK = `https://wa.me/2${WA_NUMBER}`;
 
 window.GLOBAL_STAGES = [
-    { title: 'المرحلة الإعدادية', grades: [{ name: 'الأول الإعدادي', val: 7, num: 1 }, { name: 'الثاني الإعدادي', val: 8, num: 2 }, { name: 'الثالث الإعدادي', val: 9, num: 3 }] },
-    { title: 'المرحلة الثانوية', grades: [{ name: 'الصف الأول الثانوى', val: 10, num: 1 }, { name: 'الثاني الثانوى', val: 11, num: 2 }, { name: 'الثالث الثانوى', val: 12, num: 3 }] }
+    {
+        title: 'المرحلة الابتدائية',
+        grades: [
+            { name: 'الأول الابتدائي', val: 1, num: 1 },
+            { name: 'الثاني الابتدائي', val: 2, num: 2 },
+            { name: 'الثالث الابتدائي', val: 3, num: 3 },
+            { name: 'الرابع الابتدائي', val: 4, num: 4 },
+            { name: 'الخامس الابتدائي', val: 5, num: 5 },
+            { name: 'السادس الابتدائي', val: 6, num: 6 }
+        ]
+    },
+    {
+        title: 'المرحلة الإعدادية',
+        grades: [
+            { name: 'الأول الإعدادي', val: 7, num: 1 },
+            { name: 'الثاني الإعدادي', val: 8, num: 2 },
+            { name: 'الثالث الإعدادي', val: 9, num: 3 }
+        ]
+    },
+    {
+        title: 'المرحلة الثانوية',
+        grades: [
+            { name: 'الصف الأول الثانوى', val: 10, num: 1 },
+            { name: 'الثاني الثانوى', val: 11, num: 2 },
+            { name: 'الثالث الثانوى', val: 12, num: 3 }
+        ]
+    }
 ];
 
 // Helper for Admin Dashboard content selection
@@ -11,7 +36,9 @@ window.updateCountryStages = function (countryId, stageId, gradeId, autoLoad = f
     const stageSelect = document.getElementById(stageId);
     if (!stageSelect) return;
     stageSelect.innerHTML = '<option value="">اختر المرحلة</option>';
-    stageSelect.innerHTML += '<option value="ALL">كل المراحل</option>';
+    if (stageId !== 'reg-stage') {
+        stageSelect.innerHTML += '<option value="ALL">كل المراحل</option>';
+    }
     window.GLOBAL_STAGES.forEach((stage, idx) => {
         let opt = document.createElement('option');
         opt.value = idx;
@@ -27,8 +54,21 @@ window.updateGrades = function (countryId, stageId, gradeId) {
     const gradeSelect = document.getElementById(gradeId);
     if (!gradeSelect) return;
     gradeSelect.innerHTML = '<option value="">اختر الصف</option>';
-    if (stageIdx === 'ALL' || !stageIdx) {
-        gradeSelect.innerHTML += '<option value="ALL">كل الصفوف</option>';
+    if (stageIdx === 'ALL' || stageIdx === '' || stageIdx === null || stageIdx === undefined) {
+        if (stageId !== 'reg-stage') {
+            gradeSelect.innerHTML += '<option value="ALL">كل الصفوف</option>';
+            window.GLOBAL_STAGES.forEach(stage => {
+                let group = document.createElement('optgroup');
+                group.label = stage.title;
+                stage.grades.forEach(g => {
+                    let opt = document.createElement('option');
+                    opt.value = g.val;
+                    opt.textContent = `${stage.title} - ${g.name}`;
+                    group.appendChild(opt);
+                });
+                gradeSelect.appendChild(group);
+            });
+        }
     } else if (window.GLOBAL_STAGES && window.GLOBAL_STAGES[stageIdx]) {
         window.GLOBAL_STAGES[stageIdx].grades.forEach(g => {
             let opt = document.createElement('option');
@@ -39,6 +79,16 @@ window.updateGrades = function (countryId, stageId, gradeId) {
     }
 };
 
+window.getGradeName = function (val) {
+    if (val === undefined || val === null || val === '') return 'غير محدد';
+    if (val === 'ALL') return 'كل الصفوف';
+    for (let stage of window.GLOBAL_STAGES) {
+        let g = stage.grades.find(x => String(x.val) === String(val));
+        if (g) return `${stage.title} - ${g.name}`;
+    }
+    return `الصف ${val}`;
+};
+
 const COUNTRY_SYSTEMS = {
     KW: [
         { title: 'المرحلة الابتدائية', grades: [{ name: 'الصف الأول', val: 1, num: 1 }, { name: 'الصف الثاني', val: 2, num: 2 }, { name: 'الصف الثالث', val: 3, num: 3 }, { name: 'الصف الرابع', val: 4, num: 4 }, { name: 'الصف الخامس', val: 5, num: 5 }] },
@@ -47,9 +97,9 @@ const COUNTRY_SYSTEMS = {
         { title: 'الثانوية الأدبي', grades: [{ name: 'الصف العاشر', val: 13, num: 10 }, { name: 'الصف الحادي عشر', val: 14, num: 11 }, { name: 'الصف الثاني عشر', val: 15, num: 12 }] }
     ],
     EG: [
-        { title: 'المرحلة الابتدائية', grades: [{ name: 'الأول الابتدائي', val: 1, num: 1 }, { name: 'الثاني', val: 2, num: 2 }, { name: 'الثالث', val: 3, num: 3 }, { name: 'الرابع', val: 4, num: 4 }, { name: 'الخامس', val: 5, num: 5 }, { name: 'السادس', val: 6, num: 6 }] },
+        { title: 'المرحلة الابتدائية', grades: [{ name: 'الأول الابتدائي', val: 1, num: 1 }, { name: 'الثاني الابتدائي', val: 2, num: 2 }, { name: 'الثالث الابتدائي', val: 3, num: 3 }, { name: 'الرابع الابتدائي', val: 4, num: 4 }, { name: 'الخامس الابتدائي', val: 5, num: 5 }, { name: 'السادس الابتدائي', val: 6, num: 6 }] },
         { title: 'المرحلة الإعدادية', grades: [{ name: 'الأول الإعدادي', val: 7, num: 1 }, { name: 'الثاني الإعدادي', val: 8, num: 2 }, { name: 'الثالث الإعدادي', val: 9, num: 3 }] },
-        { title: 'المرحلة الثانوية', grades: [{ name: 'الصف الأول', val: 10, num: 1 }, { name: 'الثاني', val: 11, num: 2 }, { name: 'الثالث', val: 12, num: 3 }] }
+        { title: 'المرحلة الثانوية', grades: [{ name: 'الصف الأول الثانوى', val: 10, num: 1 }, { name: 'الثاني الثانوى', val: 11, num: 2 }, { name: 'الثالث الثانوى', val: 12, num: 3 }] }
     ],
     SA: [
         { title: 'الابتدائية', grades: [{ name: 'الأول الابتدائي', val: 1, num: 1 }, { name: 'الثاني', val: 2, num: 2 }, { name: 'الثالث', val: 3, num: 3 }, { name: 'الرابع', val: 4, num: 4 }, { name: 'الخامس', val: 5, num: 5 }, { name: 'السادس', val: 6, num: 6 }] },
@@ -1500,6 +1550,9 @@ window.unlockCourse = function (title, code) {
 
 
 document.addEventListener("DOMContentLoaded", async () => {
+    if (window.applyBranding) window.applyBranding();
+    if (window.initBrandingAdmin) window.initBrandingAdmin();
+
     // Populate all stage selects for login and admin pages
     const stageSelects = ['reg-stage', 'ct-stage', 'ex-stage', 'lnk-stage', 'af-stage'];
     stageSelects.forEach(id => {
@@ -1687,7 +1740,7 @@ window.injectWhatsAppButton = function () {
     if (document.getElementById('whatsapp-floating-btn')) return;
     let btn = document.createElement('a');
     btn.id = 'whatsapp-floating-btn';
-    btn.href = 'https://wa.me/201098858663?text=' + encodeURIComponent('أهلاً بك في منصة محمود منصور التعليمية.\\n');
+    btn.href = `${WA_LINK}?text=` + encodeURIComponent('أهلاً بك في منصة محمود منصور التعليمية.\n');
     btn.target = '_blank';
     btn.title = 'تواصل معنا عبر واتساب';
     btn.innerHTML = '<i class=\"fab fa-whatsapp\"></i>';
@@ -1893,3 +1946,269 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// ==========================================
+// BRANDING MANAGEMENT (LOGO & HERO IMAGE)
+// ==========================================
+window.applyBranding = async function () {
+    const customLogo = localStorage.getItem('spedia_custom_logo');
+    const customHero = localStorage.getItem('spedia_custom_hero');
+
+    const updateDOM = (logo, hero) => {
+        if (logo) {
+            document.querySelectorAll('img[src*="logo.jpg"]:not(#sidebar-profile-img), .site-logo-img, #site-logo').forEach(img => {
+                img.src = logo;
+            });
+        }
+        if (hero) {
+            document.querySelectorAll('img[alt="Hero Image"], img[src*="hero.jpg"], #hero-main-img, .hero-main-img').forEach(img => {
+                img.src = hero;
+            });
+        }
+    };
+
+    // Apply immediate local values
+    updateDOM(customLogo, customHero);
+
+    // Sync from Firestore if available
+    if (window.fsData && window.fsData.getBranding) {
+        try {
+            const b = await window.fsData.getBranding();
+            if (b) {
+                if (b.logoUrl !== undefined && b.logoUrl !== customLogo) {
+                    if (b.logoUrl) localStorage.setItem('spedia_custom_logo', b.logoUrl);
+                    else localStorage.removeItem('spedia_custom_logo');
+                }
+                if (b.heroUrl !== undefined && b.heroUrl !== customHero) {
+                    if (b.heroUrl) localStorage.setItem('spedia_custom_hero', b.heroUrl);
+                    else localStorage.removeItem('spedia_custom_hero');
+                }
+                const activeLogo = (b.logoUrl !== undefined ? b.logoUrl : customLogo) || 'logo.jpg';
+                const activeHero = (b.heroUrl !== undefined ? b.heroUrl : customHero) || 'hero.jpg';
+                updateDOM(activeLogo, activeHero);
+                if (window.initBrandingAdmin) window.initBrandingAdmin();
+            }
+        } catch (e) {
+            console.warn("Branding sync warning:", e);
+        }
+    }
+};
+
+window.previewBrandingLogo = function (input) {
+    if (input.files && input.files[0]) {
+        const preview = document.getElementById('branding-logo-preview');
+        if (preview) preview.src = URL.createObjectURL(input.files[0]);
+    }
+};
+
+window.previewBrandingLogoUrl = function (url) {
+    if (url && url.trim()) {
+        const preview = document.getElementById('branding-logo-preview');
+        if (preview) preview.src = url.trim();
+    }
+};
+
+window.previewBrandingHero = function (input) {
+    if (input.files && input.files[0]) {
+        const preview = document.getElementById('branding-hero-preview');
+        if (preview) preview.src = URL.createObjectURL(input.files[0]);
+    }
+};
+
+window.previewBrandingHeroUrl = function (url) {
+    if (url && url.trim()) {
+        const preview = document.getElementById('branding-hero-preview');
+        if (preview) preview.src = url.trim();
+    }
+};
+
+window.fileToDataUri = function (file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
+
+window.saveLogoOnly = async function () {
+    const btn = document.getElementById('btn-save-logo');
+    const oldText = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...'; }
+
+    try {
+        const fileInput = document.getElementById('branding-logo-file');
+        const urlInput = document.getElementById('branding-logo-url');
+        let logoUrl = '';
+
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            try {
+                logoUrl = await window.uploadToCloudinary(fileInput.files[0]);
+            } catch (err) {
+                console.warn('Cloudinary upload fallback to data URI:', err);
+                logoUrl = await window.fileToDataUri(fileInput.files[0]);
+            }
+        } else if (urlInput && urlInput.value.trim()) {
+            logoUrl = urlInput.value.trim();
+        } else {
+            alert('يرجى اختيار ملف صورة أو كتابة رابط الصورة أولاً.');
+            if (btn) { btn.disabled = false; btn.innerHTML = oldText; }
+            return;
+        }
+
+        localStorage.setItem('spedia_custom_logo', logoUrl);
+
+        if (window.fsData && window.fsData.saveBranding) {
+            try {
+                await window.fsData.saveBranding({ logoUrl });
+            } catch (e) {
+                console.warn('Firestore branding save error:', e);
+            }
+        }
+
+        window.applyBranding();
+        alert('تم حفظ وتطبيق لوجو المنصة بنجاح!');
+    } catch (e) {
+        alert('حدث خطأ أثناء حفظ اللوجو: ' + e.message);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = oldText; }
+    }
+};
+
+window.saveHeroOnly = async function () {
+    const btn = document.getElementById('btn-save-hero');
+    const oldText = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...'; }
+
+    try {
+        const fileInput = document.getElementById('branding-hero-file');
+        const urlInput = document.getElementById('branding-hero-url');
+        let heroUrl = '';
+
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            try {
+                heroUrl = await window.uploadToCloudinary(fileInput.files[0]);
+            } catch (err) {
+                console.warn('Cloudinary upload fallback to data URI:', err);
+                heroUrl = await window.fileToDataUri(fileInput.files[0]);
+            }
+        } else if (urlInput && urlInput.value.trim()) {
+            heroUrl = urlInput.value.trim();
+        } else {
+            alert('يرجى اختيار ملف صورة أو كتابة رابط الصورة أولاً.');
+            if (btn) { btn.disabled = false; btn.innerHTML = oldText; }
+            return;
+        }
+
+        localStorage.setItem('spedia_custom_hero', heroUrl);
+
+        if (window.fsData && window.fsData.saveBranding) {
+            try {
+                await window.fsData.saveBranding({ heroUrl });
+            } catch (e) {
+                console.warn('Firestore branding save error:', e);
+            }
+        }
+
+        window.applyBranding();
+        alert('تم حفظ وتطبيق الصورة الرئيسية بنجاح!');
+    } catch (e) {
+        alert('حدث خطأ أثناء حفظ الصورة الرئيسية: ' + e.message);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = oldText; }
+    }
+};
+
+window.saveAllBranding = async function () {
+    const logoFile = document.getElementById('branding-logo-file');
+    const logoUrlVal = document.getElementById('branding-logo-url');
+    const heroFile = document.getElementById('branding-hero-file');
+    const heroUrlVal = document.getElementById('branding-hero-url');
+
+    let newLogoUrl = null;
+    let newHeroUrl = null;
+
+    if ((logoFile && logoFile.files && logoFile.files[0]) || (logoUrlVal && logoUrlVal.value.trim())) {
+        if (logoFile && logoFile.files && logoFile.files[0]) {
+            try { newLogoUrl = await window.uploadToCloudinary(logoFile.files[0]); }
+            catch (e) { newLogoUrl = await window.fileToDataUri(logoFile.files[0]); }
+        } else {
+            newLogoUrl = logoUrlVal.value.trim();
+        }
+        localStorage.setItem('spedia_custom_logo', newLogoUrl);
+    }
+
+    if ((heroFile && heroFile.files && heroFile.files[0]) || (heroUrlVal && heroUrlVal.value.trim())) {
+        if (heroFile && heroFile.files && heroFile.files[0]) {
+            try { newHeroUrl = await window.uploadToCloudinary(heroFile.files[0]); }
+            catch (e) { newHeroUrl = await window.fileToDataUri(heroFile.files[0]); }
+        } else {
+            newHeroUrl = heroUrlVal.value.trim();
+        }
+        localStorage.setItem('spedia_custom_hero', newHeroUrl);
+    }
+
+    let payload = {};
+    if (newLogoUrl) payload.logoUrl = newLogoUrl;
+    if (newHeroUrl) payload.heroUrl = newHeroUrl;
+
+    if (Object.keys(payload).length > 0) {
+        if (window.fsData && window.fsData.saveBranding) {
+            try { await window.fsData.saveBranding(payload); } catch (e) { console.warn(e); }
+        }
+        window.applyBranding();
+        alert('تم حفظ وتطبيق الهوية البصرية (اللوجو والصورة الرئيسية) بنجاح!');
+    } else {
+        alert('لم يتم تحديد أي صورة جديدة للوجو أو الصورة الرئيسية.');
+    }
+};
+
+window.resetLogoToDefault = async function () {
+    if (!confirm('هل أنت متأكد من استعادة اللوجو الافتراضي للمنصة؟')) return;
+    localStorage.removeItem('spedia_custom_logo');
+    if (window.fsData && window.fsData.saveBranding) {
+        try { await window.fsData.saveBranding({ logoUrl: '' }); } catch (e) { console.warn(e); }
+    }
+    const preview = document.getElementById('branding-logo-preview');
+    if (preview) preview.src = 'logo.jpg';
+    const urlInput = document.getElementById('branding-logo-url');
+    if (urlInput) urlInput.value = '';
+    const fileInput = document.getElementById('branding-logo-file');
+    if (fileInput) fileInput.value = '';
+    document.querySelectorAll('img[src*="logo.jpg"]:not(#sidebar-profile-img), .site-logo-img, #site-logo').forEach(img => {
+        img.src = 'logo.jpg';
+    });
+    alert('تمت استعادة اللوجو الافتراضي بنجاح.');
+};
+
+window.resetHeroToDefault = async function () {
+    if (!confirm('هل أنت متأكد من استعادة الصورة الرئيسية الافتراضية؟')) return;
+    localStorage.removeItem('spedia_custom_hero');
+    if (window.fsData && window.fsData.saveBranding) {
+        try { await window.fsData.saveBranding({ heroUrl: '' }); } catch (e) { console.warn(e); }
+    }
+    const preview = document.getElementById('branding-hero-preview');
+    if (preview) preview.src = 'hero.jpg';
+    const urlInput = document.getElementById('branding-hero-url');
+    if (urlInput) urlInput.value = '';
+    const fileInput = document.getElementById('branding-hero-file');
+    if (fileInput) fileInput.value = '';
+    document.querySelectorAll('img[alt="Hero Image"], img[src*="hero.jpg"], #hero-main-img, .hero-main-img').forEach(img => {
+        img.src = 'hero.jpg';
+    });
+    alert('تمت استعادة الصورة الرئيسية الافتراضية بنجاح.');
+};
+
+window.initBrandingAdmin = function () {
+    const curLogo = localStorage.getItem('spedia_custom_logo') || 'logo.jpg';
+    const curHero = localStorage.getItem('spedia_custom_hero') || 'hero.jpg';
+    const logoPrev = document.getElementById('branding-logo-preview');
+    if (logoPrev) logoPrev.src = curLogo;
+    const heroPrev = document.getElementById('branding-hero-preview');
+    if (heroPrev) heroPrev.src = curHero;
+};
+
+// Immediate call
+if (typeof window !== 'undefined' && window.applyBranding) {
+    window.applyBranding();
+}
